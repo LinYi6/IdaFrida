@@ -179,7 +179,7 @@ def generate_for_func(soName, functionName, address, argNum, hasReturn):
         }
     )
 
-    generate_file_byjsdata(result, "MyIDAFrida_hook.js")
+    generate_file_byjsdata(result, "IDAFrida_hook.js")
 
 
 def getOffset(address):
@@ -203,7 +203,7 @@ def generate_for_inline(soName, address):
                 "console.log(JSON.stringify(this.context));", argsPrint
             )
 
-    generate_file_byjsdata(result, "MyIDAFrida_inline.js")
+    generate_file_byjsdata(result, "IDAFrida_inline.js")
 
 
 def get_argnum_and_ret(address):
@@ -473,7 +473,7 @@ class Frida:
 
 
 class IDAFridaMenuAction(Action):
-    TopDescription = "MyIDAFrida"
+    TopDescription = "IDA-Frida工具"
 
     def __init__(self):
         super(IDAFridaMenuAction, self).__init__()
@@ -503,7 +503,7 @@ class GenerateFridaHookScript(IDAFridaMenuAction):
     def activate(self, ctx):
         gen = ScriptGenerator(global_config)
         idb_path = os.path.dirname(idaapi.get_input_file_path())
-        out_file = os.path.join(idb_path, "MyIDAhook.js")
+        out_file = os.path.join(idb_path, "IDAhook.js")
         if ctx.form_type == idaapi.BWN_FUNCS:
             selected = [idaapi.getn_func(idx).start_ea for idx in ctx.chooser_selection]
 
@@ -552,10 +552,17 @@ class GenerateFridaDumpScript(IDAFridaMenuAction):
             if (start != idaapi.BADADDR) and (end != idaapi.BADADDR):
                 length = end - start
                 generate_dump_script(start, length)
-
+            else:
+                print("未选择起始和终止地址，请用鼠标选择需Dump段！")
+                return
 
 myViewHook = Hook()
 myViewHook.hook()
+
+if(myViewHook.hook()):
+    print("脚本导入成功！")
+else:
+    print("脚本导入失败！")
 
 action_manager.register(GenerateFridaHookScript())
 action_manager.register(GenerateFridaDumpScript())
